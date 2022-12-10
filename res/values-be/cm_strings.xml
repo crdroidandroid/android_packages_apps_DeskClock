@@ -16,18 +16,18 @@
      limitations under the License.
 -->
 <resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="flip_action_title">Действие при обръщане</string>
-    <string name="shake_action_title">Действие при разклащане</string>
+    <string name="flip_action_title">Дзеянне пры павароце прылады</string>
+    <string name="shake_action_title">Дзеянне пры ўстрэсванні прылады</string>
     <string-array name="action_setting_entries">
-        <item>Отлагане</item>
-        <item>Отхвърли</item>
-        <item>Нищо</item>
+        <item>Адкласці</item>
+        <item>Адхіліць</item>
+        <item>Нічога</item>
     </string-array>
-    <string name="firing_alarms_timers_channel">Стартиране на аларми &amp; таймери</string>
-    <string name="alarm_missed_channel">Пропуснати аларми</string>
-    <string name="alarm_snooze_channel">Отложени аларми</string>
-    <string name="alarm_upcoming_channel">Предстоящи аларми</string>
-    <string name="stopwatch_channel">Хронометър</string>
+    <string name="firing_alarms_timers_channel">Запуск будзільнікаў і таймераў</string>
+    <string name="alarm_missed_channel">Прапушчаныя будзільнікі</string>
+    <string name="alarm_snooze_channel">Адкладзеныя будзільнікі</string>
+    <string name="alarm_upcoming_channel">Наступныя будзільнікі</string>
+    <string name="stopwatch_channel">Секундамер</string>
     <string name="timer_channel">Таймер</string>
-    <string name="dialog_permissions_dismiss">Отхвърли</string>
+    <string name="dialog_permissions_dismiss">Адхіліць</string>
 </resources>

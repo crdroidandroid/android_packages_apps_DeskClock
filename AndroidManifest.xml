@@ -22,7 +22,7 @@
     <original-package android:name="com.android.alarmclock" />
     <original-package android:name="com.android.deskclock" />
 
-    <uses-sdk android:minSdkVersion="27" android:targetSdkVersion="30" />
+    <uses-sdk android:minSdkVersion="27" android:targetSdkVersion="33" />
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -36,14 +36,8 @@
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="org.codeaurora.permission.POWER_OFF_ALARM" />
 
-    <!-- WRITE_SETTINGS is required to record the upcoming alarm prior to L -->
-    <uses-permission
-        android:name="android.permission.WRITE_SETTINGS"
-        android:maxSdkVersion="19" />
-    <!-- READ_PHONE_STATE is required to determine when a phone call exists prior to M -->
-    <uses-permission
-        android:name="android.permission.READ_PHONE_STATE"
-        android:maxSdkVersion="22" />
+    <!-- READ_PHONE_STATE is required to determine when a phone call exists prior to M and on T -->
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 
     <application
         android:name=".DeskClockApplication"
@@ -290,12 +284,9 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="android.app.action.NEXT_ALARM_CLOCK_CHANGED" />
-                <action android:name="android.intent.action.DATE_CHANGED" />
                 <action android:name="android.intent.action.LOCALE_CHANGED" />
-                <action android:name="android.intent.action.SCREEN_ON" />
                 <action android:name="android.intent.action.TIME_SET" />
                 <action android:name="android.intent.action.TIMEZONE_CHANGED" />
-                <action android:name="com.android.deskclock.ALARM_CHANGED" />
                 <action android:name="com.android.deskclock.ON_DAY_CHANGE" />
                 <action android:name="com.android.deskclock.WORLD_CITIES_CHANGED" />
             </intent-filter>

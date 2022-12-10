@@ -21,9 +21,11 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -71,7 +73,6 @@ import static android.util.TypedValue.COMPLEX_UNIT_PX;
 import static android.view.View.GONE;
 import static android.view.View.MeasureSpec.UNSPECIFIED;
 import static android.view.View.VISIBLE;
-import static com.android.deskclock.alarms.AlarmStateManager.ACTION_ALARM_CHANGED;
 import static com.android.deskclock.data.DataModel.ACTION_WORLD_CITIES_CHANGED;
 import static java.lang.Math.max;
 import static java.lang.Math.round;
@@ -98,6 +99,8 @@ import static java.lang.Math.round;
 public class DigitalAppWidgetProvider extends AppWidgetProvider {
 
     private static final LogUtils.Logger LOGGER = new LogUtils.Logger("DigitalWidgetProvider");
+
+    private static boolean sReceiversRegistered;
 
     /**
      * Intent action used for refreshing a world city display when any of them changes days or when
@@ -141,12 +144,9 @@ public class DigitalAppWidgetProvider extends AppWidgetProvider {
         final String action = intent.getAction();
         switch (action) {
             case ACTION_NEXT_ALARM_CLOCK_CHANGED:
-            case ACTION_DATE_CHANGED:
             case ACTION_LOCALE_CHANGED:
-            case ACTION_SCREEN_ON:
             case ACTION_TIME_CHANGED:
             case ACTION_TIMEZONE_CHANGED:
-            case ACTION_ALARM_CHANGED:
             case ACTION_ON_DAY_CHANGE:
             case ACTION_WORLD_CITIES_CHANGED:
                 for (int widgetId : widgetIds) {
@@ -168,10 +168,22 @@ public class DigitalAppWidgetProvider extends AppWidgetProvider {
     @Override
     public void onUpdate(Context context, AppWidgetManager wm, int[] widgetIds) {
         super.onUpdate(context, wm, widgetIds);
+        registerReceivers(context, this);
 
         for (int widgetId : widgetIds) {
             relayoutWidget(context, wm, widgetId, wm.getAppWidgetOptions(widgetId));
         }
+    }
+
+    private static void registerReceivers(Context context, BroadcastReceiver receiver) {
+        if (sReceiversRegistered) return;
+
+        IntentFilter intentFilter = new IntentFilter();
+        intentFilter.addAction(ACTION_WORLD_CITIES_CHANGED);
+        intentFilter.addAction(ACTION_ON_DAY_CHANGE);
+        context.getApplicationContext().registerReceiver(receiver, intentFilter);
+
+        sReceiversRegistered = true;
     }
 
     /**

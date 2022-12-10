@@ -16,12 +16,16 @@
 
 package com.android.deskclock;
 
+import android.Manifest;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
 import android.animation.ValueAnimator;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -54,8 +58,13 @@ import com.android.deskclock.widget.toast.SnackbarManager;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.snackbar.Snackbar;
 
+import static android.content.Intent.FLAG_ACTIVITY_NEW_TASK;
+import static android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS;
 import static android.text.format.DateUtils.SECOND_IN_MILLIS;
 import static com.android.deskclock.AnimatorUtils.getScaleAnimator;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The main activity of the application which displays 4 different tabs contains alarms, world
@@ -125,6 +134,15 @@ public class DeskClock extends BaseActivity
             "org.codeaurora.permission.POWER_OFF_ALARM";
 
     private static final int CODE_FOR_ALARM_PERMISSION = 1;
+
+    private static final int INVALID_RES = -1;
+
+    private static final int[] PERMISSION_ERROR_MESSAGE_RES_IDS = {
+            0,
+            R.string.dialog_permissions_post_notifications,
+            R.string.dialog_permissions_read_phone_state,
+            R.string.dialog_permissions_notifications_and_phone,
+    };
 
     @Override
     public void onNewIntent(Intent newIntent) {
@@ -428,17 +446,126 @@ public class DeskClock extends BaseActivity
     }
 
     private void checkPermissions() {
-        if (checkSelfPermission(PERMISSION_POWER_OFF_ALARM)
-                != PackageManager.PERMISSION_GRANTED) {
-            requestPermissions(new String[]{PERMISSION_POWER_OFF_ALARM}, CODE_FOR_ALARM_PERMISSION);
+        final List<String> missingPermissions = new ArrayList<>();
+        if (!hasPowerOffPermission()) {
+            missingPermissions.add(PERMISSION_POWER_OFF_ALARM);
+        }
+        if (!hasNotificationPermission()) {
+            missingPermissions.add(Manifest.permission.POST_NOTIFICATIONS);
+        }
+        if (!hasPhonePermission()) {
+            missingPermissions.add(Manifest.permission.READ_PHONE_STATE);
+        }
+
+        if (!missingPermissions.isEmpty()) {
+            final String[] requestArray = missingPermissions.toArray(new String[0]);
+            requestPermissions(requestArray, CODE_FOR_ALARM_PERMISSION);
         }
     }
 
+    private boolean hasPermission(String permission) {
+        return checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED;
+    }
+
+    private boolean hasPowerOffPermission() {
+        return hasPermission(PERMISSION_POWER_OFF_ALARM);
+    }
+
+    private boolean hasNotificationPermission() {
+        return hasPermission(Manifest.permission.POST_NOTIFICATIONS);
+    }
+
+    private boolean hasPhonePermission() {
+        return hasPermission(Manifest.permission.READ_PHONE_STATE);
+    }
+
+    private boolean hasEssentialPermissions() {
+        return hasNotificationPermission() && hasPhonePermission();
+    }
+
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String permissions[], int[] grantResults) {
-        if (requestCode == CODE_FOR_ALARM_PERMISSION){
-            LogUtils.i("Power off alarm permission is granted.");
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        if (requestCode == CODE_FOR_ALARM_PERMISSION) {
+            if (hasEssentialPermissions()) {
+                LogUtils.i("Essential permissions granted!");
+                if (hasPermission(PERMISSION_POWER_OFF_ALARM)) {
+                    LogUtils.i("Power off alarm permission is granted.");
+                } else {
+                    showRationale(PERMISSION_POWER_OFF_ALARM,
+                            R.string.dialog_permissions_power_off_alarm, INVALID_RES, false);
+                }
+            } else {
+                essentialPermissionsDenied();
+            }
+        }
+    }
+
+    private void showRationale(String permission, @StringRes int messageRes,
+                               @StringRes int errorRes, boolean finishWhenDenied) {
+        if (shouldShowRequestPermissionRationale(permission)) {
+            showPermissionRationale(messageRes, this::checkPermissions, finishWhenDenied);
+        } else if (errorRes != INVALID_RES){
+            showPermissionError(errorRes, finishWhenDenied);
+        }
+    }
+
+    private void essentialPermissionsDenied() {
+        if ((!shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS) &&
+                !hasNotificationPermission()) ||
+                !shouldShowRequestPermissionRationale(Manifest.permission.READ_PHONE_STATE)) {
+            showPermissionError(R.string.dialog_permissions_no_permission, true);
+        } else {
+            // Explain the user why the denied permission is needed
+            int error = 0;
+
+            if (!hasNotificationPermission()) {
+                error |= 1;
+            }
+            if (!hasPhonePermission()) {
+                error |= 1 << 1;
+            }
+
+            showPermissionRationale(PERMISSION_ERROR_MESSAGE_RES_IDS[error],
+                    this::checkPermissions, true);
+        }
+    }
+
+    private void showPermissionRationale(@StringRes int messageRes, Runnable requestAgain,
+                                         Boolean finishWhenDenied) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_permissions_title)
+                .setMessage(messageRes)
+                .setPositiveButton(R.string.dialog_permissions_ask,
+                        (dialog, position) -> {
+                            dialog.dismiss();
+                            requestAgain.run();
+                        })
+                .setNegativeButton(R.string.dialog_permissions_dismiss, (dialog, position) -> {
+                    maybeFinish(finishWhenDenied);
+                })
+                .show();
+    }
+
+    private void showPermissionError(@StringRes int messageRes, boolean finishWhenDenied) {
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.dialog_permissions_title)
+                .setMessage(messageRes)
+                .setPositiveButton(R.string.dialog_permissions_settings, (dialog, position) -> {
+                    startActivity(new Intent(ACTION_APPLICATION_DETAILS_SETTINGS)
+                            .setData(Uri.fromParts("package", getPackageName(), null))
+                            .addFlags(FLAG_ACTIVITY_NEW_TASK));
+
+                })
+                .setNegativeButton(R.string.dialog_permissions_dismiss, (dialog, position) ->
+                        maybeFinish(finishWhenDenied))
+                .setOnDismissListener(dialog -> { maybeFinish(finishWhenDenied); })
+                .show();
+    }
+
+    private void maybeFinish(boolean finish) {
+        if (finish) {
+            finish();
         }
     }
 
