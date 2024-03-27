@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2012-2016 The CyanogenMod Project
-     Copyright (C) 2017-2018 The LineageOS Project
+     Copyright (C) 2017-2024 The LineageOS Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -42,4 +42,27 @@
     <string name="widget_choice_title">Alegeţi un stil</string>
     <string name="widget_name_transparent">Transparent</string>
     <string name="widget_name_solid">Cu fundal</string>
+    <string name="clock_brightness_percentage">%s%%</string>
+    <string name="night_mode_enabled_title">Activat</string>
+    <string name="night_mode_dnd_title">Urmărește starea DND</string>
+    <string name="night_mode_dnd_summary">Modul noapte urmează starea Nu deranjați</string>
+    <string name="show_ampm_title">Afișare AM/PM</string>
+    <string name="show_ampm_summary">Dacă descriptorul AM/PM este afișat în ceasul digital</string>
+    <string name="bold_text_title">Text îngroșat ceas</string>
+    <string name="bold_text_summary">Dacă textul ceasului digital ar trebui să fie îngroșat</string>
+    <string name="night_mode_brightness_text_title">Luminozitate</string>
+    <string name="clock_color_title">Culoare</string>
+    <string-array name="clock_color_entries">
+        <item>Alb</item>
+        <item>Roșu</item>
+        <item>Verde</item>
+        <item>Albastru</item>
+    </string-array>
+    <string name="screensaver_settings_title">Economizor de ecran</string>
+    <string name="screensaver_preview">Previzualizare</string>
+    <string name="screensaver_preview_summary">Pornește imediat economizorul de ecran</string>
+    <string name="screensaver_change_settings">Setări</string>
+    <string name="screensaver_change_settings_summary">Deschide setările economizorului ecranului al ceasului</string>
+    <string name="screensaver_daydream_settings">Selectează/activează economizorul de ecran</string>
+    <string name="screensaver_daydream_settings_summary">Deschide setările economizorului ecranului al ecranului principal</string>
 </resources>

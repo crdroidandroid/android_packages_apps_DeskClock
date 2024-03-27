@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2012-2016 The CyanogenMod Project
-     Copyright (C) 2017-2018 The LineageOS Project
+     Copyright (C) 2017-2024 The LineageOS Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -29,5 +29,9 @@
     <string name="alarm_upcoming_channel">Tulevat hälytykset</string>
     <string name="stopwatch_channel">Sekuntikello</string>
     <string name="timer_channel">Ajastin</string>
+    <string name="dialog_permissions_title">Käyttöoikeudet</string>
+    <string name="dialog_permissions_ask">Kysy uudelleen</string>
     <string name="dialog_permissions_dismiss">Hylkää</string>
+    <string name="dialog_permissions_settings">Asetukset</string>
+    <string name="screensaver_change_settings">Asetukset</string>
 </resources>

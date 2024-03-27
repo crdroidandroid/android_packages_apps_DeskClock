@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2012-2016 The CyanogenMod Project
-     Copyright (C) 2017-2018 The LineageOS Project
+     Copyright (C) 2017-2024 The LineageOS Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -42,4 +42,27 @@
     <string name="widget_choice_title">Scegli uno stile</string>
     <string name="widget_name_transparent">Sfondo trasparente</string>
     <string name="widget_name_solid">Sfondo a tinta unita</string>
+    <string name="clock_brightness_percentage">%s%%</string>
+    <string name="night_mode_enabled_title">Attiva</string>
+    <string name="night_mode_dnd_title">Segui modalità Non disturbare</string>
+    <string name="night_mode_dnd_summary">La modalità notturna segue la modalità Non disturbare</string>
+    <string name="show_ampm_title">Mostra AM/PM</string>
+    <string name="show_ampm_summary">Abilita la visualizzazione di AM/PM nell\'orologio digitale</string>
+    <string name="bold_text_title">Testo orologio in grassetto</string>
+    <string name="bold_text_summary">Abilita la visualizzazione in grassetto del testo dell\'orologio digitale</string>
+    <string name="night_mode_brightness_text_title">Luminosità</string>
+    <string name="clock_color_title">Colore</string>
+    <string-array name="clock_color_entries">
+        <item>Bianco</item>
+        <item>Rosso</item>
+        <item>Verde</item>
+        <item>Blu</item>
+    </string-array>
+    <string name="screensaver_settings_title">Salvaschermo</string>
+    <string name="screensaver_preview">Anteprima</string>
+    <string name="screensaver_preview_summary">Avvia immediatamente il salvaschermo</string>
+    <string name="screensaver_change_settings">Impostazioni</string>
+    <string name="screensaver_change_settings_summary">Apre le impostazioni di salvaschermo dell\'orologio</string>
+    <string name="screensaver_daydream_settings">Seleziona/abilita salvaschermo</string>
+    <string name="screensaver_daydream_settings_summary">Apre le impostazioni principali del salvaschermo</string>
 </resources>

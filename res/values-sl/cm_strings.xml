@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
      Copyright (C) 2012-2016 The CyanogenMod Project
-     Copyright (C) 2017-2018 The LineageOS Project
+     Copyright (C) 2017-2024 The LineageOS Project
 
      Licensed under the Apache License, Version 2.0 (the "License");
      you may not use this file except in compliance with the License.
@@ -42,4 +42,27 @@
     <string name="widget_choice_title">Izberite vaš slog</string>
     <string name="widget_name_transparent">Prosojno</string>
     <string name="widget_name_solid">Zapolnjeno</string>
+    <string name="clock_brightness_percentage">%s%%</string>
+    <string name="night_mode_enabled_title">Omogočen</string>
+    <string name="night_mode_dnd_title">Sledi Ne moti stanju</string>
+    <string name="night_mode_dnd_summary">Nočni način sledi Ne moti stanju</string>
+    <string name="show_ampm_title">Prikaži AM/PM</string>
+    <string name="show_ampm_summary">Če je AM/PM pripona prikazana v digitalni uri</string>
+    <string name="bold_text_title">Krepko besedilo ure</string>
+    <string name="bold_text_summary">Če bi besedilo ure moralo biti krepko</string>
+    <string name="night_mode_brightness_text_title">Svetlost</string>
+    <string name="clock_color_title">Barva</string>
+    <string-array name="clock_color_entries">
+        <item>Bela</item>
+        <item>Rdeča</item>
+        <item>Zelena</item>
+        <item>Modra</item>
+    </string-array>
+    <string name="screensaver_settings_title">Ohranjevalnik zaslona</string>
+    <string name="screensaver_preview">Predogled</string>
+    <string name="screensaver_preview_summary">Zažene ohranjevalnik zaslona takoj</string>
+    <string name="screensaver_change_settings">Nastavitve</string>
+    <string name="screensaver_change_settings_summary">Odpre nastavitve urinega ohranjevalnika zaslona</string>
+    <string name="screensaver_daydream_settings">Izberi/omogoči ohranjevalnik zaslona</string>
+    <string name="screensaver_daydream_settings_summary">Odpre glavne nastavitve ohranjevalnika zaslona</string>
 </resources>
