@@ -40,6 +40,7 @@ import com.android.deskclock.DeskClock;
 import com.android.deskclock.LogUtils;
 import com.android.deskclock.R;
 import com.android.deskclock.Utils;
+import com.android.deskclock.data.AlarmScheduleCalculator;
 import com.android.deskclock.data.DataModel;
 import com.android.deskclock.events.Events;
 import com.android.deskclock.provider.Alarm;
@@ -228,7 +229,7 @@ public final class AlarmStateManager extends BroadcastReceiver {
             return;
         }
 
-        if (!alarm.daysOfWeek.isRepeating()) {
+        if (!AlarmScheduleCalculator.isRepeating(alarm)) {
             if (alarm.deleteAfterUse) {
                 LogUtils.i("Deleting parent alarm: " + alarm.id);
                 Alarm.deleteAlarm(cr, alarm.id);
@@ -241,10 +242,12 @@ public final class AlarmStateManager extends BroadcastReceiver {
             // Schedule the next repeating instance which may be before the current instance if a
             // time jump has occurred. Otherwise, if the current instance is the next instance
             // and has already been fired, schedule the subsequent instance.
-            AlarmInstance nextRepeatedInstance = alarm.createInstanceAfter(getCurrentTime());
+            AlarmInstance nextRepeatedInstance = AlarmScheduleCalculator.createInstanceAfter(
+                    context, alarm, getCurrentTime());
             if (instance.mAlarmState > AlarmInstance.FIRED_STATE
                     && nextRepeatedInstance.getAlarmTime().equals(instance.getAlarmTime())) {
-                nextRepeatedInstance = alarm.createInstanceAfter(instance.getAlarmTime());
+                nextRepeatedInstance = AlarmScheduleCalculator.createInstanceAfter(
+                        context, alarm, instance.getAlarmTime());
             }
 
             LogUtils.i("Creating new instance for repeating alarm " + alarm.id + " at " +
@@ -751,11 +754,14 @@ public final class AlarmStateManager extends BroadcastReceiver {
                 LogUtils.e("Found instance without matching alarm; deleting instance %s", instance);
                 continue;
             }
-            final Calendar priorAlarmTime = alarm.getPreviousAlarmTime(instance.getAlarmTime());
+            final Calendar priorAlarmTime = AlarmScheduleCalculator.getPreviousAlarmTime(
+                    context, alarm, instance.getAlarmTime());
             final Calendar missedTTLTime = instance.getMissedTimeToLive();
-            if (currentTime.before(priorAlarmTime) || currentTime.after(missedTTLTime)) {
+            if ((priorAlarmTime != null && currentTime.before(priorAlarmTime))
+                    || currentTime.after(missedTTLTime)) {
                 final Calendar oldAlarmTime = instance.getAlarmTime();
-                final Calendar newAlarmTime = alarm.getNextAlarmTime(currentTime);
+                final Calendar newAlarmTime = AlarmScheduleCalculator.getNextAlarmTime(
+                        context, alarm, currentTime);
                 final CharSequence oldTime = DateFormat.format("MM/dd/yyyy hh:mm a", oldAlarmTime);
                 final CharSequence newTime = DateFormat.format("MM/dd/yyyy hh:mm a", newAlarmTime);
                 LogUtils.i("A time change has caused an existing alarm scheduled to fire at %s to" +

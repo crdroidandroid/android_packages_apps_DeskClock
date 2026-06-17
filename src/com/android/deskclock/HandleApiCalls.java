@@ -39,6 +39,7 @@ import android.text.format.DateFormat;
 
 import com.android.deskclock.alarms.AlarmStateManager;
 import com.android.deskclock.controller.Controller;
+import com.android.deskclock.data.AlarmScheduleCalculator;
 import com.android.deskclock.data.DataModel;
 import com.android.deskclock.data.Timer;
 import com.android.deskclock.data.Weekdays;
@@ -356,7 +357,7 @@ public class HandleApiCalls extends Activity {
             // No existing alarm could be located; create one using the intent data.
             alarm = new Alarm();
             updateAlarmFromIntent(alarm, intent);
-            alarm.deleteAfterUse = !alarm.daysOfWeek.isRepeating() && skipUi;
+            alarm.deleteAfterUse = !AlarmScheduleCalculator.isRepeating(alarm) && skipUi;
 
             // Save the new alarm.
             Alarm.addAlarm(cr, alarm);
@@ -367,7 +368,8 @@ public class HandleApiCalls extends Activity {
 
         // Schedule the next instance.
         final Calendar now = DataModel.getDataModel().getCalendar();
-        final AlarmInstance alarmInstance = alarm.createInstanceAfter(now);
+        final AlarmInstance alarmInstance = AlarmScheduleCalculator.createInstanceAfter(
+                this, alarm, now);
         setupInstance(alarmInstance, skipUi);
 
         final String time = DateFormat.getTimeFormat(this)

@@ -26,6 +26,7 @@ import android.view.ViewGroup;
 
 import com.android.deskclock.AlarmUtils;
 import com.android.deskclock.R;
+import com.android.deskclock.data.AlarmScheduleCalculator;
 import com.android.deskclock.events.Events;
 import com.android.deskclock.provider.Alarm;
 import com.android.deskclock.provider.AlarmInstance;
@@ -203,7 +204,8 @@ public final class AlarmUpdateHandler {
 
     private AlarmInstance setupAlarmInstance(Alarm alarm) {
         final ContentResolver cr = mAppContext.getContentResolver();
-        AlarmInstance newInstance = alarm.createInstanceAfter(Calendar.getInstance());
+        AlarmInstance newInstance = AlarmScheduleCalculator.createInstanceAfter(
+                mAppContext, alarm, Calendar.getInstance());
         newInstance = AlarmInstance.addInstance(cr, newInstance);
         // Register instance to state manager
         AlarmStateManager.registerInstance(mAppContext, newInstance, true);

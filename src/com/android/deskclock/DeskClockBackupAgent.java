@@ -30,6 +30,7 @@ import android.os.SystemClock;
 import androidx.annotation.NonNull;
 
 import com.android.deskclock.alarms.AlarmStateManager;
+import com.android.deskclock.data.AlarmScheduleCalculator;
 import com.android.deskclock.data.DataModel;
 import com.android.deskclock.provider.Alarm;
 import com.android.deskclock.provider.AlarmInstance;
@@ -127,7 +128,8 @@ public class DeskClockBackupAgent extends BackupAgent {
 
             if (alarm.enabled) {
                 // Create the next alarm instance to schedule.
-                AlarmInstance alarmInstance = alarm.createInstanceAfter(now);
+                AlarmInstance alarmInstance = AlarmScheduleCalculator.createInstanceAfter(
+                        context, alarm, now);
 
                 // Add the next alarm instance to the database.
                 alarmInstance = AlarmInstance.addInstance(contentResolver, alarmInstance);
