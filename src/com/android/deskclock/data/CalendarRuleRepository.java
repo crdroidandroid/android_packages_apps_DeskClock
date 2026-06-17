@@ -68,6 +68,11 @@ public final class CalendarRuleRepository {
             if (rule.workdays.contains(ymd)) {
                 return true;
             }
+
+            String defaultRule = rule.defaultRule;
+            if (defaultRule != null && !defaultRule.isEmpty()) {
+                return fallbackIsWorkday(defaultRule, day);
+            }
         }
 
         return fallbackIsWorkday(fallback, day);
@@ -153,10 +158,16 @@ public final class CalendarRuleRepository {
                 if (names != null) {
                     for (int j = 0; j < names.length(); j++) {
                         String year = names.getString(j);
-                        years.put(Integer.parseInt(year), yearsJson.getString(year));
+                        try {
+                            years.put(Integer.parseInt(year), yearsJson.getString(year));
+                        } catch (NumberFormatException ignored) {
+                            // Skip malformed year keys.
+                        }
                     }
                 }
-                mIndex.put(id, years);
+                if (!years.isEmpty()) {
+                    mIndex.put(id, years);
+                }
             }
         } catch (JSONException | IOException | Resources.NotFoundException ignored) {
             // Missing or invalid data falls back to mon_to_fri scheduling.

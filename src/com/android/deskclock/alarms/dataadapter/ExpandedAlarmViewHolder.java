@@ -324,10 +324,11 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
             startDelay += delayIncrement;
             workdayAnimation.setStartDelay(startDelay);
         }
+        startDelay += delayIncrement;
         vibrateAnimation.setStartDelay(startDelay);
         ringtoneAnimation.setStartDelay(startDelay);
-        startDelay += delayIncrement;
         if (daysVisible) {
+            startDelay += delayIncrement;
             repeatDaysAnimation.setStartDelay(startDelay);
         }
 
