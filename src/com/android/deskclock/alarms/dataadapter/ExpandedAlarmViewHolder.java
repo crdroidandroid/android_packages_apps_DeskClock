@@ -45,6 +45,7 @@ import com.android.deskclock.Utils;
 import com.android.deskclock.alarms.AlarmTimeClickHandler;
 import com.android.deskclock.data.DataModel;
 import com.android.deskclock.data.RepeatRuleEngine;
+import com.android.deskclock.data.WorkdayRepeatPolicy;
 import com.android.deskclock.events.Events;
 import com.android.deskclock.provider.Alarm;
 import com.android.deskclock.provider.AlarmInstance;
@@ -157,7 +158,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         final Context context = itemView.getContext();
         bindEditLabel(context, alarm);
         bindDaysOfWeekButtons(alarm, context);
-        bindWorkdayRepeat(alarm);
+        bindWorkdayRepeat(context, alarm);
         bindVibrator(alarm);
         bindRingtone(context, alarm);
         bindPreemptiveDismissButton(context, alarm, alarmInstance);
@@ -211,8 +212,13 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         }
     }
 
-    private void bindWorkdayRepeat(Alarm alarm) {
-        workdayRepeat.setChecked(RepeatRuleEngine.isWorkdayRule(alarm.repeatRule));
+    private void bindWorkdayRepeat(Context context, Alarm alarm) {
+        final boolean isWorkday = RepeatRuleEngine.isWorkdayRule(alarm.repeatRule);
+        final boolean shouldShowWorkdayRepeat = isWorkday
+                || WorkdayRepeatPolicy.shouldShowChinaMainlandWorkdayRepeat(context);
+
+        workdayRepeat.setVisibility(shouldShowWorkdayRepeat ? View.VISIBLE : View.GONE);
+        workdayRepeat.setChecked(isWorkday);
     }
 
     private void bindEditLabel(Context context, Alarm alarm) {
@@ -314,8 +320,10 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         }
         startDelay += delayIncrement;
         editLabelAnimation.setStartDelay(startDelay);
-        startDelay += delayIncrement;
-        workdayAnimation.setStartDelay(startDelay);
+        if (workdayRepeat.getVisibility() == View.VISIBLE) {
+            startDelay += delayIncrement;
+            workdayAnimation.setStartDelay(startDelay);
+        }
         vibrateAnimation.setStartDelay(startDelay);
         ringtoneAnimation.setStartDelay(startDelay);
         startDelay += delayIncrement;
@@ -401,8 +409,10 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
             repeatDaysAnimation.setStartDelay(startDelay);
             startDelay += delayIncrement;
         }
-        workdayAnimation.setStartDelay(startDelay);
-        startDelay += delayIncrement;
+        if (workdayRepeat.getVisibility() == View.VISIBLE) {
+            workdayAnimation.setStartDelay(startDelay);
+            startDelay += delayIncrement;
+        }
         ringtoneAnimation.setStartDelay(startDelay);
         vibrateAnimation.setStartDelay(startDelay);
         startDelay += delayIncrement;
@@ -428,8 +438,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
     }
 
     private int countNumberOfItems() {
-        // Always between 5 and 7 items.
-        int numberOfItems = 5;
+        // Always between 4 and 7 items.
+        int numberOfItems = workdayRepeat.getVisibility() == View.VISIBLE ? 5 : 4;
         if (preemptiveDismissButton.getVisibility() == View.VISIBLE) {
             numberOfItems++;
         }
