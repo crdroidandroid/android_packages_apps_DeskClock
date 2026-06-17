@@ -24,6 +24,47 @@
     <string name="workday_repeat_cn_mainland">"法定工作日：中国大陆"</string>
     <string name="workday_repeat_cn_mainland_short">"工作日（中国大陆）"</string>
     <string name="workday_repeat_cn_mainland_desc">"按中国大陆法定工作日响铃，包含调休上班日"</string>
+    <string name="pre_reminder">"提前提醒"</string>
+    <string name="pre_reminder_configure">"提前提醒规则"</string>
+    <string name="pre_reminder_default_label">"提前提醒"</string>
+    <string name="pre_reminder_summary">"提前 %1$d 分钟 · 每 %2$d 天 · %3$s"</string>
+    <string name="pre_reminder_summary_weekly">"提前 %1$d 分钟 · 每周 %2$s · %3$s"</string>
+    <string name="pre_reminder_summary_additive">"叠加"</string>
+    <string name="pre_reminder_summary_absolute">"至少提前"</string>
+    <string name="pre_reminder_rules_summary">"%1$d 条提前提醒规则"</string>
+    <string name="pre_reminder_empty">"没有提前提醒规则"</string>
+    <string name="pre_reminder_rule">"提前提醒规则"</string>
+    <string name="pre_reminder_configured_rules">"已配置规则"</string>
+    <string name="pre_reminder_add_rule_section">"添加规则"</string>
+    <string name="pre_reminder_add_date_interval">"每 N 天规则"</string>
+    <string name="pre_reminder_add_weekly">"每周规则"</string>
+    <string name="pre_reminder_starts_on">"从 %1$s 起"</string>
+    <string name="pre_reminder_edit_rule">"编辑%1$s"</string>
+    <string name="pre_reminder_label_field">"标签"</string>
+    <string name="pre_reminder_offset_field">"提前分钟数"</string>
+    <string name="pre_reminder_interval_field">"每 N 天"</string>
+    <string name="pre_reminder_anchor_field">"开始日期（YYYY-MM-DD）"</string>
+    <string name="pre_reminder_anchor_value">"开始日期：%1$s"</string>
+    <string name="pre_reminder_combine_additive">"本次提前时间叠加"</string>
+    <string name="pre_reminder_combine_absolute">"只要求至少提前这么久"</string>
+    <string name="pre_reminder_selector_date_interval">"每 N 个自然日"</string>
+    <string name="pre_reminder_selector_weekly">"每周选定日期"</string>
+    <string name="pre_reminder_weekday_mon">"星期一"</string>
+    <string name="pre_reminder_weekday_tue">"星期二"</string>
+    <string name="pre_reminder_weekday_wed">"星期三"</string>
+    <string name="pre_reminder_weekday_thu">"星期四"</string>
+    <string name="pre_reminder_weekday_fri">"星期五"</string>
+    <string name="pre_reminder_weekday_sat">"星期六"</string>
+    <string name="pre_reminder_weekday_sun">"星期日"</string>
+    <string name="pre_reminder_weekday_short_mon">"周一"</string>
+    <string name="pre_reminder_weekday_short_tue">"周二"</string>
+    <string name="pre_reminder_weekday_short_wed">"周三"</string>
+    <string name="pre_reminder_weekday_short_thu">"周四"</string>
+    <string name="pre_reminder_weekday_short_fri">"周五"</string>
+    <string name="pre_reminder_weekday_short_sat">"周六"</string>
+    <string name="pre_reminder_weekday_short_sun">"周日"</string>
+    <string name="pre_reminder_weekday_none">"未选择"</string>
+    <string name="pre_reminder_weekday_separator">"、"</string>
     <string name="alarm_repeat" msgid="7242985466344233206">"重复"</string>
     <string name="delete" msgid="5732434972457000541">"删除"</string>
     <string name="default_alarm_ringtone_title" msgid="2916376768509623643">"默认闹钟提示音"</string>

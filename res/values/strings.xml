@@ -37,6 +37,49 @@
     <string name="workday_repeat_cn_mainland_short">Workdays (China)</string>
     <string name="workday_repeat_cn_mainland_desc">Rings on official workdays in China, including adjusted working days</string>
 
+    <!-- Setting labels on Set alarm screen: pre-reminder attached to an alarm -->
+    <string name="pre_reminder">Pre-reminder</string>
+    <string name="pre_reminder_configure">Pre-reminder rules</string>
+    <string name="pre_reminder_default_label">Pre-reminder</string>
+    <string name="pre_reminder_summary">%1$d min early · every %2$d days · %3$s</string>
+    <string name="pre_reminder_summary_weekly">%1$d min early · weekly %2$s · %3$s</string>
+    <string name="pre_reminder_summary_additive">stack</string>
+    <string name="pre_reminder_summary_absolute">at least</string>
+    <string name="pre_reminder_rules_summary">%1$d pre-reminder rules</string>
+    <string name="pre_reminder_empty">No pre-reminder rules</string>
+    <string name="pre_reminder_rule">Pre-reminder rule</string>
+    <string name="pre_reminder_configured_rules">Configured rules</string>
+    <string name="pre_reminder_add_rule_section">Add rule</string>
+    <string name="pre_reminder_add_date_interval">Every N days</string>
+    <string name="pre_reminder_add_weekly">Weekly rule</string>
+    <string name="pre_reminder_starts_on">From %1$s</string>
+    <string name="pre_reminder_edit_rule">Edit %1$s</string>
+    <string name="pre_reminder_label_field">Label</string>
+    <string name="pre_reminder_offset_field">Minutes early</string>
+    <string name="pre_reminder_interval_field">Every N days</string>
+    <string name="pre_reminder_anchor_field">Start date (YYYY-MM-DD)</string>
+    <string name="pre_reminder_anchor_value">Start date: %1$s</string>
+    <string name="pre_reminder_combine_additive">Stack this time</string>
+    <string name="pre_reminder_combine_absolute">Only require at least this early</string>
+    <string name="pre_reminder_selector_date_interval">Every N natural days</string>
+    <string name="pre_reminder_selector_weekly">Every week on selected days</string>
+    <string name="pre_reminder_weekday_mon">Monday</string>
+    <string name="pre_reminder_weekday_tue">Tuesday</string>
+    <string name="pre_reminder_weekday_wed">Wednesday</string>
+    <string name="pre_reminder_weekday_thu">Thursday</string>
+    <string name="pre_reminder_weekday_fri">Friday</string>
+    <string name="pre_reminder_weekday_sat">Saturday</string>
+    <string name="pre_reminder_weekday_sun">Sunday</string>
+    <string name="pre_reminder_weekday_short_mon">Mon</string>
+    <string name="pre_reminder_weekday_short_tue">Tue</string>
+    <string name="pre_reminder_weekday_short_wed">Wed</string>
+    <string name="pre_reminder_weekday_short_thu">Thu</string>
+    <string name="pre_reminder_weekday_short_fri">Fri</string>
+    <string name="pre_reminder_weekday_short_sat">Sat</string>
+    <string name="pre_reminder_weekday_short_sun">Sun</string>
+    <string name="pre_reminder_weekday_none">none</string>
+    <string name="pre_reminder_weekday_separator">", "</string>
+
     <!-- Setting labels on Set alarm screen: Delete [CHAR LIMIT=15] -->
     <string name="delete">Delete</string>
 

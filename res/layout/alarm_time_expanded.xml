@@ -182,6 +182,44 @@
         app:layout_constraintStart_toEndOf="@id/start_guide_thin"
         app:layout_constraintTop_toBottomOf="@id/choose_ringtone" />
 
+    <CheckBox
+        android:id="@+id/pre_reminder_onoff"
+        android:layout_width="0.0dip"
+        android:layout_height="@dimen/touch_target_min_size"
+        android:background="?selectableItemBackground"
+        android:button="@null"
+        android:drawablePadding="@dimen/alarm_horizontal_padding"
+        android:focusable="true"
+        android:paddingStart="@dimen/icon_margin"
+        android:paddingEnd="@dimen/icon_margin"
+        android:text="@string/pre_reminder"
+        android:textAppearance="@style/body"
+        android:drawableEnd="@drawable/selector_checkbox_material"
+        app:layout_constraintEnd_toStartOf="@id/end_guide_thin"
+        app:layout_constraintStart_toEndOf="@id/start_guide_thin"
+        app:layout_constraintTop_toBottomOf="@id/vibrate_onoff" />
+
+    <TextView
+        android:id="@+id/pre_reminder_config"
+        android:layout_width="0.0dip"
+        android:layout_height="@dimen/touch_target_min_size"
+        android:background="?selectableItemBackground"
+        android:ellipsize="end"
+        android:focusable="true"
+        android:gravity="start|center"
+        android:paddingStart="@dimen/alarm_horizontal_padding"
+        android:paddingEnd="@dimen/icon_margin"
+        android:singleLine="true"
+        android:textAlignment="viewStart"
+        android:textAppearance="@style/body"
+        android:drawableEnd="@drawable/ic_chevron_right_24dp"
+        android:drawablePadding="@dimen/alarm_horizontal_padding"
+        android:visibility="gone"
+        app:layout_constraintEnd_toStartOf="@id/end_guide_thin"
+        app:layout_constraintStart_toEndOf="@id/start_guide_thin"
+        app:layout_constraintTop_toBottomOf="@id/pre_reminder_onoff"
+        tools:text="30 min early · every 2 days from 2026-06-18"
+        tools:visibility="visible" />
 
     <Button
         android:id="@+id/preemptive_dismiss_button"
@@ -199,7 +237,7 @@
         android:textColor="@color/accent_color"
         android:visibility="gone"
         app:layout_constraintStart_toEndOf="@id/start_guide_thin"
-        app:layout_constraintTop_toBottomOf="@id/vibrate_onoff"
+        app:layout_constraintTop_toBottomOf="@id/pre_reminder_config"
         tools:text="Dismiss"
         tools:visibility="visible" />
 

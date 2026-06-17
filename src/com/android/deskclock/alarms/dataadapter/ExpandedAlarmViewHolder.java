@@ -44,6 +44,7 @@ import com.android.deskclock.ThemeUtils;
 import com.android.deskclock.Utils;
 import com.android.deskclock.alarms.AlarmTimeClickHandler;
 import com.android.deskclock.data.DataModel;
+import com.android.deskclock.data.PreReminderUiModel;
 import com.android.deskclock.data.RepeatRuleEngine;
 import com.android.deskclock.data.WorkdayRepeatPolicy;
 import com.android.deskclock.events.Events;
@@ -64,6 +65,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
     private final CompoundButton[] dayButtons;
     private final CheckBox workdayRepeat;
     private final CheckBox vibrate;
+    private final CheckBox preReminder;
+    private final TextView preReminderConfig;
     private final TextView ringtone;
     private final TextView delete;
 
@@ -80,6 +83,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         editLabel = itemView.findViewById(R.id.edit_label);
         repeatDays = itemView.findViewById(R.id.repeat_days);
         workdayRepeat = itemView.findViewById(R.id.workday_repeat);
+        preReminder = itemView.findViewById(R.id.pre_reminder_onoff);
+        preReminderConfig = itemView.findViewById(R.id.pre_reminder_config);
 
         final Context context = itemView.getContext();
         itemView.setBackground(new LayerDrawable(new Drawable[] {
@@ -128,6 +133,12 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         workdayRepeat.setOnClickListener(v ->
                 getAlarmTimeClickHandler().setWorkdayRepeatEnabled(getItemHolder().item,
                 ((CheckBox) v).isChecked()));
+        // Pre-reminder checkbox and editor handlers
+        preReminder.setOnClickListener(v ->
+                getAlarmTimeClickHandler().setBasicPreReminderEnabled(getItemHolder().item,
+                ((CheckBox) v).isChecked()));
+        preReminderConfig.setOnClickListener(v ->
+                getAlarmTimeClickHandler().onPreReminderConfigClicked(getItemHolder().item));
         // Ringtone editor handler
         ringtone.setOnClickListener(v ->
                 getAlarmTimeClickHandler().onRingtoneClicked(context, getItemHolder().item));
@@ -160,6 +171,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         bindDaysOfWeekButtons(alarm, context);
         bindWorkdayRepeat(context, alarm);
         bindVibrator(alarm);
+        bindPreReminder(context, alarm);
         bindRingtone(context, alarm);
         bindPreemptiveDismissButton(context, alarm, alarmInstance);
         bindRepeatText(context, alarm);
@@ -175,6 +187,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         ellipsizeLayout.setVisibility(View.VISIBLE);
         ringtone.setAlpha(1f);
         workdayRepeat.setAlpha(1f);
+        preReminder.setAlpha(1f);
+        preReminderConfig.setAlpha(1f);
         preemptiveDismissButton.setAlpha(1f);
         vibrate.setAlpha(1f);
         delete.setAlpha(1f);
@@ -234,6 +248,19 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         } else {
             vibrate.setVisibility(View.VISIBLE);
             vibrate.setChecked(alarm.vibrate);
+        }
+    }
+
+    private void bindPreReminder(Context context, Alarm alarm) {
+        List<PreReminderUiModel> reminders = PreReminderUiModel.fromAlarm(alarm);
+        boolean enabled = PreReminderUiModel.hasEnabled(reminders);
+        preReminder.setChecked(enabled);
+        preReminderConfig.setVisibility(enabled ? View.VISIBLE : View.GONE);
+        if (reminders.size() == 1) {
+            preReminderConfig.setText(reminders.get(0).summary(context));
+        } else {
+            preReminderConfig.setText(context.getString(
+                    R.string.pre_reminder_rules_summary, reminders.size()));
         }
     }
 
@@ -298,6 +325,10 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
                 .setDuration(shortDuration);
         final Animator vibrateAnimation = ObjectAnimator.ofFloat(vibrate, View.ALPHA, 0f)
                 .setDuration(shortDuration);
+        final Animator preReminderAnimation = ObjectAnimator.ofFloat(preReminder, View.ALPHA, 0f)
+                .setDuration(shortDuration);
+        final Animator preReminderConfigAnimation = ObjectAnimator.ofFloat(
+                preReminderConfig, View.ALPHA, 0f).setDuration(shortDuration);
         final Animator workdayAnimation = ObjectAnimator.ofFloat(workdayRepeat, View.ALPHA, 0f)
                 .setDuration(shortDuration);
         final Animator ringtoneAnimation = ObjectAnimator.ofFloat(ringtone, View.ALPHA, 0f)
@@ -326,6 +357,11 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         }
         startDelay += delayIncrement;
         vibrateAnimation.setStartDelay(startDelay);
+        preReminderAnimation.setStartDelay(startDelay);
+        if (preReminderConfig.getVisibility() == View.VISIBLE) {
+            startDelay += delayIncrement;
+            preReminderConfigAnimation.setStartDelay(startDelay);
+        }
         ringtoneAnimation.setStartDelay(startDelay);
         if (daysVisible) {
             startDelay += delayIncrement;
@@ -335,8 +371,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         final AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(backgroundAnimator, boundsAnimator,
                 repeatDaysAnimation, vibrateAnimation, ringtoneAnimation, editLabelAnimation,
-                workdayAnimation, deleteAnimation, dismissAnimation, switchAnimator,
-                clockAnimator, ellipseAnimator);
+                workdayAnimation, preReminderAnimation, preReminderConfigAnimation,
+                deleteAnimation, dismissAnimation, switchAnimator, clockAnimator, ellipseAnimator);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -365,6 +401,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         ellipsizeLayout.setVisibility(View.INVISIBLE);
         ringtone.setAlpha(0f);
         workdayRepeat.setAlpha(0f);
+        preReminder.setAlpha(0f);
+        preReminderConfig.setAlpha(0f);
         preemptiveDismissButton.setAlpha(0f);
         vibrate.setAlpha(0f);
         delete.setAlpha(0f);
@@ -391,6 +429,10 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
                 View.ALPHA, 1f).setDuration(longDuration);
         final Animator vibrateAnimation = ObjectAnimator.ofFloat(vibrate, View.ALPHA, 1f)
                 .setDuration(longDuration);
+        final Animator preReminderAnimation = ObjectAnimator.ofFloat(preReminder, View.ALPHA, 1f)
+                .setDuration(longDuration);
+        final Animator preReminderConfigAnimation = ObjectAnimator.ofFloat(
+                preReminderConfig, View.ALPHA, 1f).setDuration(longDuration);
         final Animator editLabelAnimation = ObjectAnimator.ofFloat(editLabel, View.ALPHA, 1f)
                 .setDuration(longDuration);
         final Animator deleteAnimation = ObjectAnimator.ofFloat(delete, View.ALPHA, 1f)
@@ -416,7 +458,12 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         }
         ringtoneAnimation.setStartDelay(startDelay);
         vibrateAnimation.setStartDelay(startDelay);
+        preReminderAnimation.setStartDelay(startDelay);
         startDelay += delayIncrement;
+        if (preReminderConfig.getVisibility() == View.VISIBLE) {
+            preReminderConfigAnimation.setStartDelay(startDelay);
+            startDelay += delayIncrement;
+        }
         editLabelAnimation.setStartDelay(startDelay);
         startDelay += delayIncrement;
         if (preemptiveDismissButton.getVisibility() == View.VISIBLE) {
@@ -428,7 +475,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         final AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(backgroundAnimator, boundsAnimator,
                 repeatDaysAnimation, vibrateAnimation, ringtoneAnimation, editLabelAnimation,
-                workdayAnimation, deleteAnimation, dismissAnimation, arrowAnimation);
+                workdayAnimation, preReminderAnimation, preReminderConfigAnimation,
+                deleteAnimation, dismissAnimation, arrowAnimation);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -440,7 +488,10 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
 
     private int countNumberOfItems() {
         // Always between 4 and 7 items.
-        int numberOfItems = workdayRepeat.getVisibility() == View.VISIBLE ? 5 : 4;
+        int numberOfItems = workdayRepeat.getVisibility() == View.VISIBLE ? 6 : 5;
+        if (preReminderConfig.getVisibility() == View.VISIBLE) {
+            numberOfItems++;
+        }
         if (preemptiveDismissButton.getVisibility() == View.VISIBLE) {
             numberOfItems++;
         }
@@ -454,6 +505,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         editLabel.setAlpha(alpha);
         repeatDays.setAlpha(alpha);
         workdayRepeat.setAlpha(alpha);
+        preReminder.setAlpha(alpha);
+        preReminderConfig.setAlpha(alpha);
         preemptiveDismissButton.setAlpha(alpha);
         daysOfWeek.setAlpha(alpha);
     }
