@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "calendars": [
+    {
+      "id": "cn-mainland",
+      "name": "China Mainland",
+      "years": {
+        "2026": "calendar_cn_mainland_2026"
+      }
+    }
+  ]
+}
