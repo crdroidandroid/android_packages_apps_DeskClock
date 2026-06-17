@@ -37,6 +37,11 @@ final class WorkdayRepeatRule implements RepeatRule {
     }
 
     @Override
+    public boolean matchesDate(Context context, Alarm alarm, Calendar date) {
+        return CalendarRuleRepository.get(context).isWorkday(mCalendarId, mFallback, date);
+    }
+
+    @Override
     public Calendar getNextAlarmTime(Context context, Alarm alarm, Calendar currentTime) {
         Calendar next = CalendarDateUtils.createAlarmTime(alarm, currentTime);
 

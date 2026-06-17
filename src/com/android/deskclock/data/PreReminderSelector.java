@@ -22,12 +22,6 @@ import com.android.deskclock.provider.Alarm;
 
 import java.util.Calendar;
 
-public interface RepeatRule {
-    boolean isRepeating();
-
-    boolean matchesDate(Context context, Alarm alarm, Calendar date);
-
-    Calendar getNextAlarmTime(Context context, Alarm alarm, Calendar currentTime);
-
-    Calendar getPreviousAlarmTime(Context context, Alarm alarm, Calendar currentTime);
+public interface PreReminderSelector {
+    boolean matches(Context context, Alarm alarm, RepeatRule mainRule, Calendar targetDate);
 }

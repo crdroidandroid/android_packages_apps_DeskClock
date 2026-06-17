@@ -22,12 +22,15 @@ import com.android.deskclock.provider.Alarm;
 
 import java.util.Calendar;
 
-public interface RepeatRule {
-    boolean isRepeating();
+final class WeeklySelector implements PreReminderSelector {
+    private final Weekdays mDays;
 
-    boolean matchesDate(Context context, Alarm alarm, Calendar date);
+    WeeklySelector(Weekdays days) {
+        mDays = days;
+    }
 
-    Calendar getNextAlarmTime(Context context, Alarm alarm, Calendar currentTime);
-
-    Calendar getPreviousAlarmTime(Context context, Alarm alarm, Calendar currentTime);
+    @Override
+    public boolean matches(Context context, Alarm alarm, RepeatRule mainRule, Calendar targetDate) {
+        return mDays.isRepeating() && mDays.isBitOn(targetDate.get(Calendar.DAY_OF_WEEK));
+    }
 }

@@ -22,12 +22,22 @@ import com.android.deskclock.provider.Alarm;
 
 import java.util.Calendar;
 
-public interface RepeatRule {
-    boolean isRepeating();
+final class DateIntervalSelector implements PreReminderSelector {
+    private final Calendar mAnchorDate;
+    private final int mIntervalDays;
 
-    boolean matchesDate(Context context, Alarm alarm, Calendar date);
+    DateIntervalSelector(Calendar anchorDate, int intervalDays) {
+        mAnchorDate = CalendarDateUtils.dateOnly(anchorDate);
+        mIntervalDays = intervalDays;
+    }
 
-    Calendar getNextAlarmTime(Context context, Alarm alarm, Calendar currentTime);
+    @Override
+    public boolean matches(Context context, Alarm alarm, RepeatRule mainRule, Calendar targetDate) {
+        if (mIntervalDays <= 0) {
+            return false;
+        }
 
-    Calendar getPreviousAlarmTime(Context context, Alarm alarm, Calendar currentTime);
+        int days = CalendarDateUtils.daysBetween(mAnchorDate, targetDate);
+        return days >= 0 && days % mIntervalDays == 0;
+    }
 }

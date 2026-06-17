@@ -35,6 +35,12 @@ final class LegacyWeeklyRepeatRule implements RepeatRule {
     }
 
     @Override
+    public boolean matchesDate(Context context, Alarm alarm, Calendar date) {
+        return !mDaysOfWeek.isRepeating()
+                || mDaysOfWeek.isBitOn(date.get(Calendar.DAY_OF_WEEK));
+    }
+
+    @Override
     public Calendar getNextAlarmTime(Context context, Alarm alarm, Calendar currentTime) {
         final Calendar nextInstanceTime = CalendarDateUtils.createAlarmTime(alarm, currentTime);
 

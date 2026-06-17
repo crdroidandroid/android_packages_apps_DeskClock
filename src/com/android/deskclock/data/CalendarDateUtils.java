@@ -55,6 +55,48 @@ public final class CalendarDateUtils {
                 + Integer.parseInt(parts[2]);
     }
 
+    public static Calendar parseYmd(String value, Calendar template) {
+        String[] parts = value.split("-");
+        if (parts.length != 3) {
+            throw new IllegalArgumentException("Invalid date: " + value);
+        }
+
+        Calendar calendar = Calendar.getInstance(template.getTimeZone());
+        calendar.clear();
+        calendar.set(Calendar.YEAR, Integer.parseInt(parts[0]));
+        calendar.set(Calendar.MONTH, Integer.parseInt(parts[1]) - 1);
+        calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(parts[2]));
+        return calendar;
+    }
+
+    public static Calendar dateOnly(Calendar calendar) {
+        Calendar result = Calendar.getInstance(calendar.getTimeZone());
+        result.set(Calendar.YEAR, calendar.get(Calendar.YEAR));
+        result.set(Calendar.MONTH, calendar.get(Calendar.MONTH));
+        result.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH));
+        result.set(Calendar.HOUR_OF_DAY, 0);
+        result.set(Calendar.MINUTE, 0);
+        result.set(Calendar.SECOND, 0);
+        result.set(Calendar.MILLISECOND, 0);
+        return result;
+    }
+
+    public static int daysBetween(Calendar startDate, Calendar endDate) {
+        Calendar start = dateOnly(startDate);
+        Calendar end = dateOnly(endDate);
+
+        int days = 0;
+        while (start.before(end)) {
+            start.add(Calendar.DAY_OF_YEAR, 1);
+            days++;
+        }
+        while (start.after(end)) {
+            start.add(Calendar.DAY_OF_YEAR, -1);
+            days--;
+        }
+        return days;
+    }
+
     public static boolean isMonToFri(Calendar calendar) {
         int dow = calendar.get(Calendar.DAY_OF_WEEK);
         return dow >= Calendar.MONDAY && dow <= Calendar.FRIDAY;
