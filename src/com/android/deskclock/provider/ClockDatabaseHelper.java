@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.android.deskclock.LogUtils;
+import com.android.deskclock.data.AlarmScheduleCalculator;
 import com.android.deskclock.data.Weekdays;
 
 import java.util.Calendar;
@@ -72,6 +73,11 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
      */
     private static final int VERSION_11 = 12;
 
+    /**
+     * Added repeat_rule column to alarm templates.
+     */
+    private static final int VERSION_12 = 13;
+
     // This creates a default alarm at 8:30 for every Mon,Tue,Wed,Thu,Fri
     private static final String DEFAULT_ALARM_1 = "(8, 30, 31, 0, 1, '', NULL, 0, 0);";
 
@@ -91,6 +97,7 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
                 ClockContract.AlarmsColumns.HOUR + " INTEGER NOT NULL, " +
                 ClockContract.AlarmsColumns.MINUTES + " INTEGER NOT NULL, " +
                 ClockContract.AlarmsColumns.DAYS_OF_WEEK + " INTEGER NOT NULL, " +
+                ClockContract.AlarmsColumns.REPEAT_RULE + " TEXT DEFAULT NULL, " +
                 ClockContract.AlarmsColumns.ENABLED + " INTEGER NOT NULL, " +
                 ClockContract.AlarmsColumns.VIBRATE + " INTEGER NOT NULL, " +
                 ClockContract.AlarmsColumns.LABEL + " TEXT NOT NULL, " +
@@ -119,8 +126,11 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
         LogUtils.i("Instance table created");
     }
 
+    private final Context mContext;
+
     public ClockDatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, VERSION_11);
+        super(context, DATABASE_NAME, null, VERSION_12);
+        mContext = context.getApplicationContext();
     }
 
     @Override
@@ -199,7 +209,8 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
                     // Save new version of alarm and create alarm instance for it
                     db.insert(ALARMS_TABLE_NAME, null, Alarm.createContentValues(alarm));
                     if (alarm.enabled) {
-                        AlarmInstance newInstance = alarm.createInstanceAfter(currentTime);
+                        AlarmInstance newInstance = AlarmScheduleCalculator.createInstanceAfter(
+                                mContext, alarm, currentTime);
                         db.insert(INSTANCES_TABLE_NAME, null,
                                 AlarmInstance.createContentValues(newInstance));
                     }
@@ -252,12 +263,24 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
                     null, null, null, null, null)) {
                 final Calendar currentTime = Calendar.getInstance();
                 while (cursor != null && cursor.moveToNext()) {
-                    final Alarm alarm = new Alarm(cursor);
+                    final Alarm alarm = new Alarm();
+                    alarm.id = cursor.getLong(0);
+                    alarm.hour = cursor.getInt(1);
+                    alarm.minutes = cursor.getInt(2);
+                    alarm.daysOfWeek = Weekdays.fromBits(cursor.getInt(3));
+                    alarm.enabled = cursor.getInt(4) == 1;
+                    alarm.vibrate = cursor.getInt(5) == 1;
+                    alarm.label = cursor.getString(6);
+                    final String ringtone = cursor.getString(7);
+                    alarm.alert = ringtone == null ? null : Uri.parse(ringtone);
+                    alarm.deleteAfterUse = cursor.getInt(8) == 1;
+                    alarm.increasingVolume = cursor.getInt(9) == 1;
                     // Save new version of alarm and create alarm instance for it
                     db.insert(TEMP_ALARMS_TABLE_NAME, null,
                             Alarm.createContentValues(alarm));
                     if (alarm.enabled) {
-                        AlarmInstance newInstance = alarm.createInstanceAfter(currentTime);
+                        AlarmInstance newInstance = AlarmScheduleCalculator.createInstanceAfter(
+                                mContext, alarm, currentTime);
                         db.insert(TEMP_INSTANCES_TABLE_NAME, null,
                                 AlarmInstance.createContentValues(newInstance));
                     }
@@ -269,6 +292,12 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
                     + " RENAME TO " + ALARMS_TABLE_NAME + ";");
             db.execSQL("ALTER TABLE " + TEMP_INSTANCES_TABLE_NAME
                     + " RENAME TO " + INSTANCES_TABLE_NAME + ";");
+        }
+
+        if (oldVersion >= VERSION_11 && oldVersion < VERSION_12) {
+            db.execSQL("ALTER TABLE " + ALARMS_TABLE_NAME
+                    + " ADD COLUMN " + ClockContract.AlarmsColumns.REPEAT_RULE
+                    + " TEXT DEFAULT NULL;");
         }
     }
 

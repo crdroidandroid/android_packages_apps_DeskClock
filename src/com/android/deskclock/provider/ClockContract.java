@@ -124,6 +124,12 @@ public final class ClockContract {
         String DAYS_OF_WEEK = "daysofweek";
 
         /**
+         * Extensible repeat rule encoded as JSON. Null means use {@link #DAYS_OF_WEEK}.
+         * <p>Type: STRING</p>
+         */
+        String REPEAT_RULE = "repeat_rule";
+
+        /**
          * True if alarm is active.
          * <p>Type: BOOLEAN</p>
          */

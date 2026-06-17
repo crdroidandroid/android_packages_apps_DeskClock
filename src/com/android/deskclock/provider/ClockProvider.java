@@ -63,6 +63,8 @@ public class ClockProvider extends ContentProvider {
                 ALARMS_TABLE_NAME + "." + AlarmsColumns.MINUTES);
         sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.DAYS_OF_WEEK,
                 ALARMS_TABLE_NAME + "." + AlarmsColumns.DAYS_OF_WEEK);
+        sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.REPEAT_RULE,
+                ALARMS_TABLE_NAME + "." + AlarmsColumns.REPEAT_RULE);
         sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.ENABLED,
                 ALARMS_TABLE_NAME + "." + AlarmsColumns.ENABLED);
         sAlarmsWithInstancesProjection.put(ALARMS_TABLE_NAME + "." + AlarmsColumns.VIBRATE,
