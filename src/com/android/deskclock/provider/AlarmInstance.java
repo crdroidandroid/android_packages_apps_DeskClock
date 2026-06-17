@@ -69,7 +69,9 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
             RINGTONE,
             ALARM_ID,
             ALARM_STATE,
-            INCREASING_VOLUME
+            INCREASING_VOLUME,
+            INSTANCE_KIND,
+            PRE_OFFSET_MINUTES
     };
 
     /**
@@ -88,8 +90,13 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
     private static final int ALARM_ID_INDEX = 9;
     private static final int ALARM_STATE_INDEX = 10;
     private static final int INCREASING_VOLUME_INDEX = 11;
+    private static final int INSTANCE_KIND_INDEX = 12;
+    private static final int PRE_OFFSET_MINUTES_INDEX = 13;
 
-    private static final int COLUMN_COUNT = INCREASING_VOLUME_INDEX + 1;
+    private static final int COLUMN_COUNT = PRE_OFFSET_MINUTES_INDEX + 1;
+
+    public static final String KIND_MAIN = "main";
+    public static final String KIND_PRE_REMINDER = "pre_reminder";
 
     public static ContentValues createContentValues(AlarmInstance instance) {
         ContentValues values = new ContentValues(COLUMN_COUNT);
@@ -114,6 +121,8 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
         values.put(ALARM_ID, instance.mAlarmId);
         values.put(ALARM_STATE, instance.mAlarmState);
         values.put(INCREASING_VOLUME, instance.mIncreasingVolume ? 1 : 0);
+        values.put(INSTANCE_KIND, instance.mInstanceKind);
+        values.put(PRE_OFFSET_MINUTES, instance.mPreOffsetMinutes);
 
         return values;
     }
@@ -275,6 +284,8 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
     public Long mAlarmId;
     public int mAlarmState;
     public boolean mIncreasingVolume;
+    public String mInstanceKind;
+    public int mPreOffsetMinutes;
 
     public AlarmInstance(Calendar calendar, Long alarmId) {
         this(calendar);
@@ -289,6 +300,8 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
         mRingtone = null;
         mAlarmState = SILENT_STATE;
         mIncreasingVolume = false;
+        mInstanceKind = KIND_MAIN;
+        mPreOffsetMinutes = 0;
     }
 
     public AlarmInstance(AlarmInstance instance) {
@@ -304,6 +317,8 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
          this.mAlarmId = instance.mAlarmId;
          this.mAlarmState = instance.mAlarmState;
          this.mIncreasingVolume = instance.mIncreasingVolume;
+         this.mInstanceKind = instance.mInstanceKind;
+         this.mPreOffsetMinutes = instance.mPreOffsetMinutes;
     }
 
     public AlarmInstance(Cursor c, boolean joinedTable) {
@@ -316,6 +331,21 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
             mMinute = c.getInt(Alarm.INSTANCE_MINUTE_INDEX);
             mLabel = c.getString(Alarm.INSTANCE_LABEL_INDEX);
             mVibrate = c.getInt(Alarm.INSTANCE_VIBRATE_INDEX) == 1;
+            if (c.isNull(Alarm.INSTANCE_RINGTONE_INDEX)) {
+                mRingtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            } else {
+                mRingtone = Uri.parse(c.getString(Alarm.INSTANCE_RINGTONE_INDEX));
+            }
+            if (!c.isNull(Alarm.INSTANCE_ALARM_ID_INDEX)) {
+                mAlarmId = c.getLong(Alarm.INSTANCE_ALARM_ID_INDEX);
+            }
+            mAlarmState = c.getInt(Alarm.INSTANCE_STATE_INDEX);
+            mIncreasingVolume = c.getInt(Alarm.INSTANCE_INCREASING_VOLUME_INDEX) == 1;
+            mInstanceKind = c.getString(Alarm.INSTANCE_KIND_INDEX);
+            if (mInstanceKind == null || mInstanceKind.isEmpty()) {
+                mInstanceKind = KIND_MAIN;
+            }
+            mPreOffsetMinutes = c.getInt(Alarm.INSTANCE_PRE_OFFSET_MINUTES_INDEX);
         } else {
             mId = c.getLong(ID_INDEX);
             mYear = c.getInt(YEAR_INDEX);
@@ -325,20 +355,29 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
             mMinute = c.getInt(MINUTES_INDEX);
             mLabel = c.getString(LABEL_INDEX);
             mVibrate = c.getInt(VIBRATE_INDEX) == 1;
-        }
-        if (c.isNull(RINGTONE_INDEX)) {
-            // Should we be saving this with the current ringtone or leave it null
-            // so it changes when user changes default ringtone?
-            mRingtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
-        } else {
-            mRingtone = Uri.parse(c.getString(RINGTONE_INDEX));
-        }
+            if (c.isNull(RINGTONE_INDEX)) {
+                // Should we be saving this with the current ringtone or leave it null
+                // so it changes when user changes default ringtone?
+                mRingtone = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM);
+            } else {
+                mRingtone = Uri.parse(c.getString(RINGTONE_INDEX));
+            }
 
-        if (!c.isNull(ALARM_ID_INDEX)) {
-            mAlarmId = c.getLong(ALARM_ID_INDEX);
+            if (!c.isNull(ALARM_ID_INDEX)) {
+                mAlarmId = c.getLong(ALARM_ID_INDEX);
+            }
+            mAlarmState = c.getInt(ALARM_STATE_INDEX);
+            mIncreasingVolume = c.getInt(INCREASING_VOLUME_INDEX) == 1;
+            mInstanceKind = c.getString(INSTANCE_KIND_INDEX);
+            if (mInstanceKind == null || mInstanceKind.isEmpty()) {
+                mInstanceKind = KIND_MAIN;
+            }
+            mPreOffsetMinutes = c.getInt(PRE_OFFSET_MINUTES_INDEX);
         }
-        mAlarmState = c.getInt(ALARM_STATE_INDEX);
-        mIncreasingVolume = c.getInt(INCREASING_VOLUME_INDEX) == 1;
+    }
+
+    public boolean isPreReminder() {
+        return KIND_PRE_REMINDER.equals(mInstanceKind);
     }
 
     public String getLabelOrDefault(Context context) {
@@ -449,6 +488,8 @@ public final class AlarmInstance implements ClockContract.InstancesColumns {
                 ", mAlarmId=" + mAlarmId +
                 ", mAlarmState=" + mAlarmState +
                 ", mIncreasingVolume=" + mIncreasingVolume +
+                ", mInstanceKind='" + mInstanceKind + '\'' +
+                ", mPreOffsetMinutes=" + mPreOffsetMinutes +
                 '}';
     }
 }

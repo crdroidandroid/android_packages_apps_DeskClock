@@ -222,6 +222,12 @@ public final class AlarmStateManager extends BroadcastReceiver {
      * @param instance to update parent for
      */
     private static void updateParentAlarm(Context context, AlarmInstance instance) {
+        if (instance.isPreReminder()) {
+            LogUtils.i("Pre-reminder instance dismissed without updating parent alarm: "
+                    + instance.mId);
+            return;
+        }
+
         ContentResolver cr = context.getContentResolver();
         Alarm alarm = Alarm.getAlarm(cr, instance.mAlarmId);
         if (alarm == null) {
@@ -244,16 +250,20 @@ public final class AlarmStateManager extends BroadcastReceiver {
             // and has already been fired, schedule the subsequent instance.
             AlarmInstance nextRepeatedInstance = AlarmScheduleCalculator.createInstanceAfter(
                     context, alarm, getCurrentTime());
+            Calendar after = getCurrentTime();
             if (instance.mAlarmState > AlarmInstance.FIRED_STATE
                     && nextRepeatedInstance.getAlarmTime().equals(instance.getAlarmTime())) {
-                nextRepeatedInstance = AlarmScheduleCalculator.createInstanceAfter(
-                        context, alarm, instance.getAlarmTime());
+                after = instance.getAlarmTime();
             }
 
-            LogUtils.i("Creating new instance for repeating alarm " + alarm.id + " at " +
-                    AlarmUtils.getFormattedTime(context, nextRepeatedInstance.getAlarmTime()));
-            AlarmInstance.addInstance(cr, nextRepeatedInstance);
-            registerInstance(context, nextRepeatedInstance, true);
+            List<AlarmInstance> nextInstances = AlarmScheduleCalculator.createInstancesAfter(
+                    context, alarm, after);
+            for (AlarmInstance nextInstance : nextInstances) {
+                LogUtils.i("Creating new instance for repeating alarm " + alarm.id + " at " +
+                        AlarmUtils.getFormattedTime(context, nextInstance.getAlarmTime()));
+                nextInstance = AlarmInstance.addInstance(cr, nextInstance);
+                registerInstance(context, nextInstance, true);
+            }
         }
     }
 
@@ -415,8 +425,10 @@ public final class AlarmStateManager extends BroadcastReceiver {
         if (instance.mAlarmId != null) {
             // if the time changed *backward* and pushed an instance from missed back to fired,
             // remove any other scheduled instances that may exist
-            AlarmInstance.deleteOtherInstances(context, contentResolver, instance.mAlarmId,
-                    instance.mId);
+            if (!instance.isPreReminder()) {
+                AlarmInstance.deleteOtherInstances(context, contentResolver, instance.mAlarmId,
+                        instance.mId);
+            }
         }
 
         Events.sendAlarmEvent(R.string.action_fire, 0);
@@ -775,7 +787,58 @@ public final class AlarmStateManager extends BroadcastReceiver {
             }
         }
 
+        ensurePreReminderInstances(context, currentTime);
         updateNextAlarm(context);
+    }
+
+    private static void ensurePreReminderInstances(Context context, Calendar currentTime) {
+        final ContentResolver contentResolver = context.getContentResolver();
+        final List<Alarm> alarms = Alarm.getAlarms(contentResolver, null);
+        for (Alarm alarm : alarms) {
+            if (!alarm.enabled) {
+                continue;
+            }
+
+            final List<AlarmInstance> instances =
+                    AlarmInstance.getInstancesByAlarmId(contentResolver, alarm.id);
+            AlarmInstance mainInstance = null;
+            for (AlarmInstance instance : instances) {
+                if (instance.isPreReminder()
+                        || instance.mAlarmState >= AlarmInstance.FIRED_STATE) {
+                    continue;
+                }
+
+                if (mainInstance == null
+                        || instance.getAlarmTime().before(mainInstance.getAlarmTime())) {
+                    mainInstance = instance;
+                }
+            }
+
+            if (mainInstance == null) {
+                continue;
+            }
+
+            final AlarmInstance preReminder = AlarmScheduleCalculator.createPreReminderInstance(
+                    context, alarm, mainInstance, currentTime);
+            if (preReminder == null || hasMatchingPreReminder(instances, preReminder)) {
+                continue;
+            }
+
+            final AlarmInstance added = AlarmInstance.addInstance(contentResolver, preReminder);
+            registerInstance(context, added, false /* updateNextAlarm */);
+        }
+    }
+
+    private static boolean hasMatchingPreReminder(List<AlarmInstance> instances,
+            AlarmInstance expected) {
+        for (AlarmInstance instance : instances) {
+            if (instance.isPreReminder()
+                    && instance.mAlarmState < AlarmInstance.FIRED_STATE
+                    && instance.getAlarmTime().equals(expected.getAlarmTime())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

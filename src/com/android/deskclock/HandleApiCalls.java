@@ -368,9 +368,14 @@ public class HandleApiCalls extends Activity {
 
         // Schedule the next instance.
         final Calendar now = DataModel.getDataModel().getCalendar();
-        final AlarmInstance alarmInstance = AlarmScheduleCalculator.createInstanceAfter(
-                this, alarm, now);
-        setupInstance(alarmInstance, skipUi);
+        AlarmInstance alarmInstance = null;
+        for (AlarmInstance instance : AlarmScheduleCalculator.createInstancesAfter(
+                this, alarm, now)) {
+            instance = setupInstance(instance, skipUi);
+            if (!instance.isPreReminder()) {
+                alarmInstance = instance;
+            }
+        }
 
         final String time = DateFormat.getTimeFormat(this)
                 .format(alarmInstance.getAlarmTime().getTime());
@@ -500,11 +505,13 @@ public class HandleApiCalls extends Activity {
         }
     }
 
-    private void setupInstance(AlarmInstance instance, boolean skipUi) {
+    private AlarmInstance setupInstance(AlarmInstance instance, boolean skipUi) {
         instance = AlarmInstance.addInstance(this.getContentResolver(), instance);
         AlarmStateManager.registerInstance(this, instance, true);
-        AlarmUtils.popAlarmSetToast(this, instance.getAlarmTime().getTimeInMillis());
-        if (!skipUi) {
+        if (!instance.isPreReminder()) {
+            AlarmUtils.popAlarmSetToast(this, instance.getAlarmTime().getTimeInMillis());
+        }
+        if (!skipUi && !instance.isPreReminder()) {
             // Change to the alarms tab.
             UiDataModel.getUiDataModel().setSelectedTab(ALARMS);
 
@@ -514,6 +521,7 @@ public class HandleApiCalls extends Activity {
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(showAlarm);
         }
+        return instance;
     }
 
     /**

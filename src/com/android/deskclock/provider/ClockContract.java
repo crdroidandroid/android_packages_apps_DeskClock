@@ -267,5 +267,18 @@ public final class ClockContract {
          * <p>Type: INTEGER</p>
          */
         String ALARM_STATE = "alarm_state";
+
+        /**
+         * Instance kind. "main" means a normal alarm instance; "pre_reminder" means an
+         * aggregated pre-reminder attached to the parent alarm.
+         * <p>Type: STRING</p>
+         */
+        String INSTANCE_KIND = "instance_kind";
+
+        /**
+         * Minutes between a pre-reminder and its parent main alarm instance.
+         * <p>Type: INTEGER</p>
+         */
+        String PRE_OFFSET_MINUTES = "pre_offset_minutes";
     }
 }

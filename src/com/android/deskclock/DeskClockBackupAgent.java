@@ -127,16 +127,15 @@ public class DeskClockBackupAgent extends BackupAgent {
             AlarmStateManager.deleteAllInstances(context, alarm.id);
 
             if (alarm.enabled) {
-                // Create the next alarm instance to schedule.
-                AlarmInstance alarmInstance = AlarmScheduleCalculator.createInstanceAfter(
-                        context, alarm, now);
+                for (AlarmInstance alarmInstance : AlarmScheduleCalculator.createInstancesAfter(
+                        context, alarm, now)) {
+                    // Add the next alarm instance to the database.
+                    alarmInstance = AlarmInstance.addInstance(contentResolver, alarmInstance);
 
-                // Add the next alarm instance to the database.
-                alarmInstance = AlarmInstance.addInstance(contentResolver, alarmInstance);
-
-                // Schedule the next alarm instance in AlarmManager.
-                AlarmStateManager.registerInstance(context, alarmInstance, true);
-                LOGGER.i("DeskClockBackupAgent scheduled alarm instance: %s", alarmInstance);
+                    // Schedule the next alarm instance in AlarmManager.
+                    AlarmStateManager.registerInstance(context, alarmInstance, true);
+                    LOGGER.i("DeskClockBackupAgent scheduled alarm instance: %s", alarmInstance);
+                }
             }
         }
 

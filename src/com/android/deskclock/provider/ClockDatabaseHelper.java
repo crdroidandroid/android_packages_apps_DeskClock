@@ -78,6 +78,11 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
      */
     private static final int VERSION_12 = 13;
 
+    /**
+     * Added pre-reminder metadata to alarm instances.
+     */
+    private static final int VERSION_13 = 14;
+
     // This creates a default alarm at 8:30 for every Mon,Tue,Wed,Thu,Fri
     private static final String DEFAULT_ALARM_1 = "(8, 30, 31, NULL, 0, 1, '', NULL, 0, 0);";
 
@@ -119,6 +124,10 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
                 ClockContract.InstancesColumns.LABEL + " TEXT NOT NULL, " +
                 ClockContract.InstancesColumns.RINGTONE + " TEXT, " +
                 ClockContract.InstancesColumns.ALARM_STATE + " INTEGER NOT NULL, " +
+                ClockContract.InstancesColumns.INSTANCE_KIND
+                        + " TEXT NOT NULL DEFAULT 'main', " +
+                ClockContract.InstancesColumns.PRE_OFFSET_MINUTES
+                        + " INTEGER NOT NULL DEFAULT 0, " +
                 ClockContract.InstancesColumns.ALARM_ID + " INTEGER REFERENCES " +
                     ALARMS_TABLE_NAME + "(" + ClockContract.AlarmsColumns._ID + ") " +
                     "ON UPDATE CASCADE ON DELETE CASCADE, " +
@@ -129,7 +138,7 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
     private final Context mContext;
 
     public ClockDatabaseHelper(Context context) {
-        super(context, DATABASE_NAME, null, VERSION_12);
+        super(context, DATABASE_NAME, null, VERSION_13);
         mContext = context.getApplicationContext();
     }
 
@@ -299,6 +308,15 @@ class ClockDatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("ALTER TABLE " + ALARMS_TABLE_NAME
                     + " ADD COLUMN " + ClockContract.AlarmsColumns.REPEAT_RULE
                     + " TEXT DEFAULT NULL;");
+        }
+
+        if (oldVersion < VERSION_13) {
+            db.execSQL("ALTER TABLE " + INSTANCES_TABLE_NAME
+                    + " ADD COLUMN " + ClockContract.InstancesColumns.INSTANCE_KIND
+                    + " TEXT NOT NULL DEFAULT 'main';");
+            db.execSQL("ALTER TABLE " + INSTANCES_TABLE_NAME
+                    + " ADD COLUMN " + ClockContract.InstancesColumns.PRE_OFFSET_MINUTES
+                    + " INTEGER NOT NULL DEFAULT 0;");
         }
     }
 

@@ -96,6 +96,19 @@ public class ClockProvider extends ContentProvider {
                 INSTANCES_TABLE_NAME + "." + InstancesColumns.LABEL);
         sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "." + InstancesColumns.VIBRATE,
                 INSTANCES_TABLE_NAME + "." + InstancesColumns.VIBRATE);
+        sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "." + InstancesColumns.RINGTONE,
+                INSTANCES_TABLE_NAME + "." + InstancesColumns.RINGTONE);
+        sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "." + InstancesColumns.ALARM_ID,
+                INSTANCES_TABLE_NAME + "." + InstancesColumns.ALARM_ID);
+        sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "."
+                        + InstancesColumns.INCREASING_VOLUME,
+                INSTANCES_TABLE_NAME + "." + InstancesColumns.INCREASING_VOLUME);
+        sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "."
+                        + InstancesColumns.INSTANCE_KIND,
+                INSTANCES_TABLE_NAME + "." + InstancesColumns.INSTANCE_KIND);
+        sAlarmsWithInstancesProjection.put(INSTANCES_TABLE_NAME + "."
+                        + InstancesColumns.PRE_OFFSET_MINUTES,
+                INSTANCES_TABLE_NAME + "." + InstancesColumns.PRE_OFFSET_MINUTES);
     }
 
     private static final String ALARM_JOIN_INSTANCE_TABLE_STATEMENT =

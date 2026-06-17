@@ -204,11 +204,17 @@ public final class AlarmUpdateHandler {
 
     private AlarmInstance setupAlarmInstance(Alarm alarm) {
         final ContentResolver cr = mAppContext.getContentResolver();
-        AlarmInstance newInstance = AlarmScheduleCalculator.createInstanceAfter(
-                mAppContext, alarm, Calendar.getInstance());
-        newInstance = AlarmInstance.addInstance(cr, newInstance);
-        // Register instance to state manager
-        AlarmStateManager.registerInstance(mAppContext, newInstance, true);
-        return newInstance;
+        AlarmInstance firstInstance = null;
+        for (AlarmInstance instance : AlarmScheduleCalculator.createInstancesAfter(
+                mAppContext, alarm, Calendar.getInstance())) {
+            instance = AlarmInstance.addInstance(cr, instance);
+            if (firstInstance == null
+                    || instance.getAlarmTime().before(firstInstance.getAlarmTime())) {
+                firstInstance = instance;
+            }
+            // Register instance to state manager
+            AlarmStateManager.registerInstance(mAppContext, instance, true);
+        }
+        return firstInstance;
     }
 }

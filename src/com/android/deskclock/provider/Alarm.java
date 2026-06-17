@@ -87,7 +87,15 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
             ClockDatabaseHelper.INSTANCES_TABLE_NAME + "." + ClockContract.InstancesColumns.HOUR,
             ClockDatabaseHelper.INSTANCES_TABLE_NAME + "." + ClockContract.InstancesColumns.MINUTES,
             ClockDatabaseHelper.INSTANCES_TABLE_NAME + "." + ClockContract.InstancesColumns.LABEL,
-            ClockDatabaseHelper.INSTANCES_TABLE_NAME + "." + ClockContract.InstancesColumns.VIBRATE
+            ClockDatabaseHelper.INSTANCES_TABLE_NAME + "." + ClockContract.InstancesColumns.VIBRATE,
+            ClockDatabaseHelper.INSTANCES_TABLE_NAME + "." + ClockContract.InstancesColumns.RINGTONE,
+            ClockDatabaseHelper.INSTANCES_TABLE_NAME + "." + ClockContract.InstancesColumns.ALARM_ID,
+            ClockDatabaseHelper.INSTANCES_TABLE_NAME + "."
+                    + ClockContract.InstancesColumns.INCREASING_VOLUME,
+            ClockDatabaseHelper.INSTANCES_TABLE_NAME + "."
+                    + ClockContract.InstancesColumns.INSTANCE_KIND,
+            ClockDatabaseHelper.INSTANCES_TABLE_NAME + "."
+                    + ClockContract.InstancesColumns.PRE_OFFSET_MINUTES
     };
 
     /**
@@ -115,9 +123,15 @@ public final class Alarm implements Parcelable, ClockContract.AlarmsColumns {
     public static final int INSTANCE_MINUTE_INDEX = 17;
     public static final int INSTANCE_LABEL_INDEX = 18;
     public static final int INSTANCE_VIBRATE_INDEX = 19;
+    public static final int INSTANCE_RINGTONE_INDEX = 20;
+    public static final int INSTANCE_ALARM_ID_INDEX = 21;
+    public static final int INSTANCE_INCREASING_VOLUME_INDEX = 22;
+    public static final int INSTANCE_KIND_INDEX = 23;
+    public static final int INSTANCE_PRE_OFFSET_MINUTES_INDEX = 24;
 
     private static final int COLUMN_COUNT = INCREASING_VOLUME_INDEX + 1;
-    private static final int ALARM_JOIN_INSTANCE_COLUMN_COUNT = INSTANCE_VIBRATE_INDEX + 1;
+    private static final int ALARM_JOIN_INSTANCE_COLUMN_COUNT =
+            INSTANCE_PRE_OFFSET_MINUTES_INDEX + 1;
 
     public static ContentValues createContentValues(Alarm alarm) {
         ContentValues values = new ContentValues(COLUMN_COUNT);
