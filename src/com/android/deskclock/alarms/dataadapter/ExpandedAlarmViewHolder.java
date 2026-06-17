@@ -44,6 +44,7 @@ import com.android.deskclock.ThemeUtils;
 import com.android.deskclock.Utils;
 import com.android.deskclock.alarms.AlarmTimeClickHandler;
 import com.android.deskclock.data.DataModel;
+import com.android.deskclock.data.RepeatRuleEngine;
 import com.android.deskclock.events.Events;
 import com.android.deskclock.provider.Alarm;
 import com.android.deskclock.provider.AlarmInstance;
@@ -60,6 +61,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
     private final TextView editLabel;
     private final ConstraintLayout repeatDays;
     private final CompoundButton[] dayButtons;
+    private final CheckBox workdayRepeat;
     private final CheckBox vibrate;
     private final TextView ringtone;
     private final TextView delete;
@@ -76,6 +78,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         ringtone = itemView.findViewById(R.id.choose_ringtone);
         editLabel = itemView.findViewById(R.id.edit_label);
         repeatDays = itemView.findViewById(R.id.repeat_days);
+        workdayRepeat = itemView.findViewById(R.id.workday_repeat);
 
         final Context context = itemView.getContext();
         itemView.setBackground(new LayerDrawable(new Drawable[] {
@@ -120,6 +123,10 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         vibrate.setOnClickListener(v ->
                 getAlarmTimeClickHandler().setAlarmVibrationEnabled(getItemHolder().item,
                 ((CheckBox) v).isChecked()));
+        // Workday repeat checkbox handler
+        workdayRepeat.setOnClickListener(v ->
+                getAlarmTimeClickHandler().setWorkdayRepeatEnabled(getItemHolder().item,
+                ((CheckBox) v).isChecked()));
         // Ringtone editor handler
         ringtone.setOnClickListener(v ->
                 getAlarmTimeClickHandler().onRingtoneClicked(context, getItemHolder().item));
@@ -150,6 +157,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         final Context context = itemView.getContext();
         bindEditLabel(context, alarm);
         bindDaysOfWeekButtons(alarm, context);
+        bindWorkdayRepeat(alarm);
         bindVibrator(alarm);
         bindRingtone(context, alarm);
         bindPreemptiveDismissButton(context, alarm, alarmInstance);
@@ -165,6 +173,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         onOff.setVisibility(View.VISIBLE);
         ellipsizeLayout.setVisibility(View.VISIBLE);
         ringtone.setAlpha(1f);
+        workdayRepeat.setAlpha(1f);
         preemptiveDismissButton.setAlpha(1f);
         vibrate.setAlpha(1f);
         delete.setAlpha(1f);
@@ -186,6 +195,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
 
     private void bindDaysOfWeekButtons(Alarm alarm, Context context) {
         final List<Integer> weekdays = DataModel.getDataModel().getWeekdayOrder().getCalendarDays();
+        final boolean isWorkday = RepeatRuleEngine.isWorkdayRule(alarm.repeatRule);
         for (int i = 0; i < weekdays.size(); i++) {
             final CompoundButton dayButton = dayButtons[i];
             if (alarm.daysOfWeek.isBitOn(weekdays.get(i))) {
@@ -196,7 +206,13 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
                 dayButton.setChecked(false);
                 dayButton.setTextColor(Color.WHITE);
             }
+            dayButton.setEnabled(!isWorkday);
+            dayButton.setAlpha(isWorkday ? 0.4f : 1f);
         }
+    }
+
+    private void bindWorkdayRepeat(Alarm alarm) {
+        workdayRepeat.setChecked(RepeatRuleEngine.isWorkdayRule(alarm.repeatRule));
     }
 
     private void bindEditLabel(Context context, Alarm alarm) {
@@ -276,6 +292,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
                 .setDuration(shortDuration);
         final Animator vibrateAnimation = ObjectAnimator.ofFloat(vibrate, View.ALPHA, 0f)
                 .setDuration(shortDuration);
+        final Animator workdayAnimation = ObjectAnimator.ofFloat(workdayRepeat, View.ALPHA, 0f)
+                .setDuration(shortDuration);
         final Animator ringtoneAnimation = ObjectAnimator.ofFloat(ringtone, View.ALPHA, 0f)
                 .setDuration(shortDuration);
         final Animator dismissAnimation = ObjectAnimator.ofFloat(preemptiveDismissButton,
@@ -297,6 +315,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         startDelay += delayIncrement;
         editLabelAnimation.setStartDelay(startDelay);
         startDelay += delayIncrement;
+        workdayAnimation.setStartDelay(startDelay);
         vibrateAnimation.setStartDelay(startDelay);
         ringtoneAnimation.setStartDelay(startDelay);
         startDelay += delayIncrement;
@@ -307,7 +326,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         final AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(backgroundAnimator, boundsAnimator,
                 repeatDaysAnimation, vibrateAnimation, ringtoneAnimation, editLabelAnimation,
-                deleteAnimation, dismissAnimation, switchAnimator, clockAnimator, ellipseAnimator);
+                workdayAnimation, deleteAnimation, dismissAnimation, switchAnimator,
+                clockAnimator, ellipseAnimator);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animation) {
@@ -335,6 +355,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         onOff.setVisibility(View.INVISIBLE);
         ellipsizeLayout.setVisibility(View.INVISIBLE);
         ringtone.setAlpha(0f);
+        workdayRepeat.setAlpha(0f);
         preemptiveDismissButton.setAlpha(0f);
         vibrate.setAlpha(0f);
         delete.setAlpha(0f);
@@ -354,6 +375,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         final Animator repeatDaysAnimation = ObjectAnimator.ofFloat(repeatDays, View.ALPHA, 1f)
                 .setDuration(longDuration);
         final Animator ringtoneAnimation = ObjectAnimator.ofFloat(ringtone, View.ALPHA, 1f)
+                .setDuration(longDuration);
+        final Animator workdayAnimation = ObjectAnimator.ofFloat(workdayRepeat, View.ALPHA, 1f)
                 .setDuration(longDuration);
         final Animator dismissAnimation = ObjectAnimator.ofFloat(preemptiveDismissButton,
                 View.ALPHA, 1f).setDuration(longDuration);
@@ -378,6 +401,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
             repeatDaysAnimation.setStartDelay(startDelay);
             startDelay += delayIncrement;
         }
+        workdayAnimation.setStartDelay(startDelay);
+        startDelay += delayIncrement;
         ringtoneAnimation.setStartDelay(startDelay);
         vibrateAnimation.setStartDelay(startDelay);
         startDelay += delayIncrement;
@@ -392,7 +417,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
         final AnimatorSet animatorSet = new AnimatorSet();
         animatorSet.playTogether(backgroundAnimator, boundsAnimator,
                 repeatDaysAnimation, vibrateAnimation, ringtoneAnimation, editLabelAnimation,
-                deleteAnimation, dismissAnimation, arrowAnimation);
+                workdayAnimation, deleteAnimation, dismissAnimation, arrowAnimation);
         animatorSet.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationStart(Animator animator) {
@@ -403,8 +428,8 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
     }
 
     private int countNumberOfItems() {
-        // Always between 4 and 6 items.
-        int numberOfItems = 4;
+        // Always between 5 and 7 items.
+        int numberOfItems = 5;
         if (preemptiveDismissButton.getVisibility() == View.VISIBLE) {
             numberOfItems++;
         }
@@ -417,6 +442,7 @@ public final class ExpandedAlarmViewHolder extends AlarmItemViewHolder {
     private void setChangingViewsAlpha(float alpha) {
         editLabel.setAlpha(alpha);
         repeatDays.setAlpha(alpha);
+        workdayRepeat.setAlpha(alpha);
         preemptiveDismissButton.setAlpha(alpha);
         daysOfWeek.setAlpha(alpha);
     }

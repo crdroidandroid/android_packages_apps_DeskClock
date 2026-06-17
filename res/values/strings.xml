@@ -32,6 +32,11 @@
     <!-- Setting labels on Set alarm screen: Vibration on or off -->
     <string name="alarm_vibrate">Vibrate</string>
 
+    <!-- Setting labels on Set alarm screen: China Mainland official workdays repeat rule -->
+    <string name="workday_repeat_cn_mainland">Official workdays in China</string>
+    <string name="workday_repeat_cn_mainland_short">Workdays (China)</string>
+    <string name="workday_repeat_cn_mainland_desc">Rings on official workdays in China, including adjusted working days</string>
+
     <!-- Setting labels on Set alarm screen: Delete [CHAR LIMIT=15] -->
     <string name="delete">Delete</string>
 

@@ -27,6 +27,7 @@ import androidx.annotation.Nullable;
 
 import com.android.deskclock.R;
 import com.android.deskclock.data.DataModel;
+import com.android.deskclock.data.RepeatRuleEngine;
 import com.android.deskclock.data.Weekdays;
 import com.android.deskclock.provider.Alarm;
 import com.android.deskclock.widget.TextTime;
@@ -60,7 +61,9 @@ public class AlarmSelectionAdapter extends ArrayAdapter<Alarm> {
 
         // find days when alarm is firing
         final String daysOfWeek;
-        if (!alarm.daysOfWeek.isRepeating()) {
+        if (RepeatRuleEngine.isWorkdayRule(alarm.repeatRule)) {
+            daysOfWeek = context.getString(R.string.workday_repeat_cn_mainland_short);
+        } else if (!alarm.daysOfWeek.isRepeating()) {
             daysOfWeek = Alarm.isTomorrow(alarm, Calendar.getInstance()) ?
                     context.getResources().getString(R.string.alarm_tomorrow) :
                     context.getResources().getString(R.string.alarm_today);

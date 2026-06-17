@@ -29,7 +29,9 @@ import com.android.deskclock.LabelDialogFragment;
 import com.android.deskclock.LogUtils;
 import com.android.deskclock.R;
 import com.android.deskclock.alarms.dataadapter.AlarmItemHolder;
+import com.android.deskclock.data.AlarmScheduleCalculator;
 import com.android.deskclock.data.DataModel;
+import com.android.deskclock.data.RepeatRules;
 import com.android.deskclock.events.Events;
 import com.android.deskclock.provider.Alarm;
 import com.android.deskclock.provider.AlarmInstance;
@@ -108,13 +110,42 @@ public final class AlarmTimeClickHandler {
 
     public void setDayOfWeekEnabled(Alarm alarm, boolean checked, int index) {
         final Calendar now = Calendar.getInstance();
-        final Calendar oldNextAlarmTime = alarm.getNextAlarmTime(now);
+        final Calendar oldNextAlarmTime = AlarmScheduleCalculator.getNextAlarmTime(
+                mContext, alarm, now);
 
         final int weekday = DataModel.getDataModel().getWeekdayOrder().getCalendarDays().get(index);
+        alarm.repeatRule = null;
         alarm.daysOfWeek = alarm.daysOfWeek.setBit(weekday, checked);
 
         // if the change altered the next scheduled alarm time, tell the user
-        final Calendar newNextAlarmTime = alarm.getNextAlarmTime(now);
+        final Calendar newNextAlarmTime = AlarmScheduleCalculator.getNextAlarmTime(
+                mContext, alarm, now);
+        final boolean popupToast = !oldNextAlarmTime.equals(newNextAlarmTime);
+        mAlarmUpdateHandler.asyncUpdateAlarm(alarm, popupToast, false);
+    }
+
+    public void setWorkdayRepeatEnabled(Alarm alarm, boolean enabled) {
+        final Calendar now = Calendar.getInstance();
+        final Calendar oldNextAlarmTime = AlarmScheduleCalculator.getNextAlarmTime(
+                mContext, alarm, now);
+
+        if (enabled) {
+            alarm.repeatRule = RepeatRules.workday(
+                    RepeatRules.CALENDAR_CN_MAINLAND, RepeatRules.FALLBACK_MON_TO_FRI);
+            alarm.daysOfWeek = alarm.daysOfWeek
+                    .setBit(Calendar.MONDAY, true)
+                    .setBit(Calendar.TUESDAY, true)
+                    .setBit(Calendar.WEDNESDAY, true)
+                    .setBit(Calendar.THURSDAY, true)
+                    .setBit(Calendar.FRIDAY, true)
+                    .setBit(Calendar.SATURDAY, false)
+                    .setBit(Calendar.SUNDAY, false);
+        } else {
+            alarm.repeatRule = null;
+        }
+
+        final Calendar newNextAlarmTime = AlarmScheduleCalculator.getNextAlarmTime(
+                mContext, alarm, now);
         final boolean popupToast = !oldNextAlarmTime.equals(newNextAlarmTime);
         mAlarmUpdateHandler.asyncUpdateAlarm(alarm, popupToast, false);
     }

@@ -30,6 +30,7 @@ import com.android.deskclock.ItemAdapter;
 import com.android.deskclock.ItemAnimator;
 import com.android.deskclock.R;
 import com.android.deskclock.data.DataModel;
+import com.android.deskclock.data.RepeatRuleEngine;
 import com.android.deskclock.data.Weekdays;
 import com.android.deskclock.provider.Alarm;
 import com.android.deskclock.provider.AlarmInstance;
@@ -124,7 +125,11 @@ public abstract class AlarmItemViewHolder extends ItemAdapter.ItemViewHolder<Ala
     }
 
     protected void bindRepeatText(Context context, Alarm alarm) {
-        if (alarm.daysOfWeek.isRepeating()) {
+        if (RepeatRuleEngine.isWorkdayRule(alarm.repeatRule)) {
+            daysOfWeek.setText(context.getString(R.string.workday_repeat_cn_mainland_short));
+            daysOfWeek.setContentDescription(
+                    context.getString(R.string.workday_repeat_cn_mainland_desc));
+        } else if (alarm.daysOfWeek.isRepeating()) {
             final Weekdays.Order weekdayOrder = DataModel.getDataModel().getWeekdayOrder();
             final String daysOfWeekText = alarm.daysOfWeek.toString(context, weekdayOrder);
             daysOfWeek.setText(daysOfWeekText);
